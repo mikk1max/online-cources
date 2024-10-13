@@ -3,57 +3,39 @@ package com.example.onlinecourses.controller;
 import com.example.onlinecourses.model.Course;
 import com.example.onlinecourses.model.Student;
 import com.example.onlinecourses.model.Enrollment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api") // Added a base path for the API
 public class CourseController {
 
-    private final List<Course> courses = new ArrayList<>();
-    private final List<Student> students = new ArrayList<>();
-    private final List<Enrollment> enrollments = new ArrayList<>();
-
-    // Get all courses
     @GetMapping("/courses")
     public List<Course> getCourses() {
+        List<Course> courses = new ArrayList<>();
+        courses.add(new Course("Spring Boot Basics", "Learn the basics of Spring Boot", 10));
+        courses.add(new Course("React Native", "Build mobile apps using React Native", 8));
         return courses;
     }
 
-    // Get all students
     @GetMapping("/students")
     public List<Student> getStudents() {
+        List<Student> students = new ArrayList<>();
+        students.add(new Student("John Doe", 22));
+        students.add(new Student("Jane Doe", 21));
         return students;
     }
 
-    // Get all enrollments
-    @GetMapping("/enrollments")
+    @RequestMapping(method = RequestMethod.GET, value = "/enrollments")
     public List<Enrollment> getEnrollments() {
+        Student student = new Student("John Doe", 22);
+        Course course = new Course("Spring Boot Basics", "Learn the basics of Spring Boot", 10);
+        List<Enrollment> enrollments = new ArrayList<>();
+        enrollments.add(new Enrollment(student, course));
         return enrollments;
-    }
-
-    // Add a new course
-    @PostMapping("/courses")
-    public ResponseEntity<Course> addCourse(@RequestBody Course course) {
-        courses.add(course);
-        return new ResponseEntity<>(course, HttpStatus.CREATED);
-    }
-
-    // Add a new student
-    @PostMapping("/students")
-    public ResponseEntity<Student> addStudent(@RequestBody Student student) {
-        students.add(student);
-        return new ResponseEntity<>(student, HttpStatus.CREATED);
-    }
-
-    // Enroll a student in a course
-    @PostMapping("/enrollments")
-    public ResponseEntity<Enrollment> enrollStudent(@RequestBody Enrollment enrollment) {
-        enrollments.add(enrollment);
-        return new ResponseEntity<>(enrollment, HttpStatus.CREATED);
     }
 }
