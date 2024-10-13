@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,46 +19,51 @@ import java.util.stream.Stream;
 @Controller
 public class HomeController {
 
-    private static final String STUDENT_FILE_PATH = "students.txt"; // Путь к файлу
+    private static final String STUDENT_FILE_PATH = "students.txt"; // Ścieżka do pliku
 
     @GetMapping("/")
     public String home(Model model) {
         List<Course> courses = new ArrayList<>();
-        courses.add(new Course("Spring Boot Basics", "Learn the basics of Spring Boot", 10));
-        courses.add(new Course("React Native", "Build mobile apps using React Native", 8));
+        courses.add(new Course("Spring Boot Basics", "Poznaj podstawy Spring Boot", 10));
+        courses.add(new Course("React Native", "Twórz aplikacje mobilne za pomocą React Native", 8));
 
         List<Student> students = new ArrayList<>();
-        students.add(new Student("John Doe", 22));
-        students.add(new Student("Jane Doe", 21));
         students.add(new Student("Milena Runets", 21));
         students.add(new Student("Max Shepeta", 20));
         students.add(new Student("Leanid Shaveika", 21));
-        students.add(new Student("Oleg Nowak", 25));
-        students.add(new Student("Oleg Nowak", 21));
         students.add(new Student("John Doe", 22));
+        students.add(new Student("Oleg Nowak", 21));
+        students.add(new Student("Jane Doe", 21));
+        students.add(new Student("Justin Quinn", 15));
+        students.add(new Student("Rayan Goslindg", 13));
+        students.add(new Student("Oleg Nowak", 25));
+        students.add(new Student("John Doe", 22));
+        students.add(new Student("Adam Kim", 55));
+        students.add(new Student("Nicholas Jones", 15));
 
-        // Запись студентов в файл
+
+        // Zapisz studentów do pliku w porządku alfabetycznym i tylko tych, którzy mają 18 lat lub więcej
         writeStudentsToFile(students);
 
-        // Чтение студентов из файла
+        // Odczytaj studentów z pliku
         List<Student> studentsFromFile = readStudentsFromFile();
 
         List<Student> streamStudents = students.stream()
                 .filter(student -> student.getName().contains("a"))
                 .collect(Collectors.toList());
 
-        // Подсчет повторяющихся имен студентов
+        // Zliczanie powtarzających się imion studentów
         Map<String, Long> nameCount = students.stream()
                 .collect(Collectors.groupingBy(Student::getName, Collectors.counting()));
 
-        // Выводим только повторяющиеся имена
+        // Wyświetlaj tylko powtarzające się imiona
         Map<String, Long> duplicateNames = nameCount.entrySet().stream()
                 .filter(entry -> entry.getValue() > 1)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         long amountDuplicateNames = duplicateNames.size();
 
-        // Стрим только имена
+        // Strumień tylko imion
         Stream<String> streamStudent = students.stream().map(Student::getName);
         List<Enrollment> enrollments = new ArrayList<>();
         enrollments.add(new Enrollment(students.get(0), courses.get(0)));
@@ -67,7 +71,7 @@ public class HomeController {
 
         model.addAttribute("courses", courses);
         model.addAttribute("students", students);
-        model.addAttribute("studentsFromFile", studentsFromFile); // Добавляем считанных студентов
+        model.addAttribute("studentsFromFile", studentsFromFile); // Dodajemy odczytanych studentów
         model.addAttribute("enrollments", enrollments);
         model.addAttribute("filteredStudents", streamStudents);
         model.addAttribute("duplicateNames", duplicateNames);
@@ -76,10 +80,12 @@ public class HomeController {
         return "index";
     }
 
-    // Метод для записи студентов в файл
+    // Metoda do zapisu studentów do pliku
     private void writeStudentsToFile(List<Student> students) {
         List<String> studentLines = students.stream()
-                .map(student -> student.getName() + "," + student.getAge()) // Формат записи: имя,возраст
+                .filter(student -> student.getAge() >= 18) // Filtrujemy studentów, którzy mają 18 lat lub więcej
+                .sorted((s1, s2) -> s1.getName().compareToIgnoreCase(s2.getName())) // Sortujemy po imieniu
+                .map(student -> student.getName() + "," + student.getAge()) // Format zapisu: imię,wiek
                 .collect(Collectors.toList());
         try {
             Files.write(Paths.get(STUDENT_FILE_PATH), studentLines);
@@ -88,12 +94,12 @@ public class HomeController {
         }
     }
 
-    // Метод для чтения студентов из файла
+    // Metoda do odczytu studentów z pliku
     private List<Student> readStudentsFromFile() {
         List<Student> students = new ArrayList<>();
         try (Stream<String> lines = Files.lines(Paths.get(STUDENT_FILE_PATH))) {
             lines.forEach(line -> {
-                String[] parts = line.split(","); // Предполагаем, что данные в формате: имя,возраст
+                String[] parts = line.split(","); // Zakładamy, że dane są w formacie: imię,wiek
                 if (parts.length == 2) {
                     String name = parts[0];
                     int age = Integer.parseInt(parts[1]);

@@ -1,8 +1,9 @@
-John Doe,22
+Adam Kim,55
 Jane Doe,21
-Milena Runets,21
-Max Shepeta,20
-Leanid Shaveika,21
-Oleg Nowak,25
-Oleg Nowak,21
 John Doe,22
+John Doe,22
+Leanid Shaveika,21
+Max Shepeta,20
+Milena Runets,21
+Oleg Nowak,21
+Oleg Nowak,25
