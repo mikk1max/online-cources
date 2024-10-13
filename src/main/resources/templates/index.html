@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Online Courses</title>
+</head>
+<body>
+<h1>Welcome to Online Courses</h1>
+
+<h2>Add a Course</h2>
+<form action="/courses" method="post">
+    <input type="text" name="title" placeholder="Course Title" required />
+    <input type="text" name="description" placeholder="Course Description" required />
+    <input type="number" name="duration" placeholder="Course Duration (hours)" required />
+    <button type="submit">Add Course</button>
+</form>
+
+<h2>Add a Student</h2>
+<form action="/students" method="post">
+    <input type="text" name="name" placeholder="Student Name" required />
+    <input type="number" name="age" placeholder="Student Age" required />
+    <button type="submit">Add Student</button>
+</form>
+
+<h2>Courses</h2>
+<ul>
+    <li th:each="course : ${courses}">
+        <span th:text="${course.title}">Course Title</span> -
+        <span th:text="${course.description}">Course Description</span>
+        (<span th:text="${course.duration}">Course Duration</span> hours)
+    </li>
+</ul>
+
+<h2>Students</h2>
+<ul>
+    <li th:each="student : ${students}">
+        <span th:text="${student.name}">Student Name</span>,
+        <span th:text="${student.age}">Student Age</span> years old
+    </li>
+</ul>
+</body>
+</html>
