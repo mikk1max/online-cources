@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 public class HomeController {
 
     private static final String STUDENT_FILE_PATH = "students.txt";
+    private static final String COURSE_FILE_PATH = "courses.txt";
     private static final String ENROLLMENT_FILE_PATH = "enrollments.txt";
 
     private List<Course> courses;
@@ -114,6 +115,30 @@ public class HomeController {
         // Strumień tylko imion
         Stream<String> streamStudent = students.stream().map(Student::getName);
 
+        //!Courses part
+        //Filtrowanie po ciagu znakow kluczowemu
+        Stream<Course> streamCoursesWithJava = courses.stream()
+                .filter(course -> course.getTitle().contains("Java"));
+
+        //Zliczanie powtarzajacych sie godzin trwania kursow
+        Map<Integer, Long> courseCount = courses.stream()
+                .collect(Collectors.groupingBy(Course::getDuration, Collectors.counting()));
+
+        Map<Integer, Long> duplicateDurationsOfCourses = courseCount.entrySet().stream()
+                .filter(entry -> entry.getValue() > 1)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        long amountOfDuplicateCourses = duplicateDurationsOfCourses.size();
+
+        //Wyswietlanie czasu trwania kursow w minutach
+        Stream<String> streamCourseDurationsInMinutes = courses.stream()
+                .map(course -> course.getTitle() + " - " + (course.getDuration() * 60) + " minutes");
+
+        //dodanie do pliku
+        writeCoursesToFile(courses);
+        //odczytanie z pliku
+        List<Course> coursesFromFile = readCoursesFromFile();
+
 
 
         // !Enrollments part
@@ -142,6 +167,11 @@ public class HomeController {
 
 
         model.addAttribute("courses", courses);
+        model.addAttribute("streamCoursesWithJava", streamCoursesWithJava);
+        model.addAttribute("duplicateDurationsOfCourses", duplicateDurationsOfCourses);
+        model.addAttribute("amountOfDuplicateCourses", amountOfDuplicateCourses);
+        model.addAttribute("streamCourseDurationsInMinutes", streamCourseDurationsInMinutes);
+        model.addAttribute("coursesFromFile", coursesFromFile);
 
         model.addAttribute("students", students);
         model.addAttribute("filteredStudents", streamStudents);
@@ -155,6 +185,38 @@ public class HomeController {
         model.addAttribute("enrollmentsFromFile", enrollmentsFromFile);
 
         return "index";
+    }
+
+    // Metoda do zapisu kursow do pliku
+    private void writeCoursesToFile(List<Course> courses) {
+        List<String> coursesLines = courses.stream()
+                .filter(course -> course.getDuration() >= 8) // Filtrujemy kursy, którzy trwaja 8 godzin lub więcej
+                .sorted(Comparator.comparingInt(Course::getDuration)) // Sortujemy po czasu trwania
+                .map(course -> course.getTitle() + "-" + course.getDuration()) // Format zapisu: nazwa-czas
+                .collect(Collectors.toList());
+        try {
+            Files.write(Paths.get(COURSE_FILE_PATH), coursesLines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Metoda do odczytu kursow z pliku
+    private List<Course> readCoursesFromFile() {
+        List<Course> courses = new ArrayList<>();
+        try (Stream<String> lines = Files.lines(Paths.get(COURSE_FILE_PATH))) {
+            lines.forEach(line -> {
+                String[] parts = line.split("-"); // Zakładamy, że dane są w formacie: nazwa-czas
+                if (parts.length == 2) {
+                    String title = parts[0];
+                    int duration = Integer.parseInt(parts[1]);
+                    courses.add(new Course(title, "", duration));
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return courses;
     }
 
     // Metoda do zapisu studentów do pliku

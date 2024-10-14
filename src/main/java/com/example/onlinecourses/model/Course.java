@@ -3,7 +3,7 @@ package com.example.onlinecourses.model;
 public class Course {
     private String title;
     private String description;
-    private int duration; // в часах
+    private int duration; // w godzinach
 
     public Course(String title, String description, int duration) {
         this.title = title;
@@ -11,7 +11,7 @@ public class Course {
         this.duration = duration;
     }
 
-    // Геттеры и сеттеры
+    // gettery i settery
     public String getTitle() {
         return title;
     }

@@ -37,6 +37,38 @@
             (<span th:text="${course.duration}">Course Duration</span> hours)
         </li>
     </ul>
+    <!-- Courses with word "Java" in it -->
+    <h2>Filtered courses with word "Java" in it</h2>
+    <ul>
+        <li th:each="course : ${streamCoursesWithJava}">
+            <span th:text="${course.title}">Course Title</span> -
+            <span th:text="${course.description}">Course Description</span>
+            (<span th:text="${course.duration}">Course Duration</span> hours)
+        </li>
+    </ul>
+    <h2>Duplicated Durations of Courses</h2>
+    <ul>
+        <li th:each="entry : ${duplicateDurationsOfCourses}">
+            <span th:text="${entry.key}">Course</span> hours duration -
+            <span th:text="${entry.value}">Count</span> time(s)
+        </li>
+        <li>
+            <span th:text="${amountOfDuplicateCourses}"> </span> - amount of duplicated durations of courses
+        </li>
+    </ul>
+    <h2>Courses with Durations in Minutes</h2>
+    <ul>
+        <li th:each="course : ${streamCourseDurationsInMinutes}">
+            <span th:text="${course}">Course Title - Duration in Minutes</span>
+        </li>
+    </ul>
+    <h2>Courses from File (sort + filter(>=8,1...10))</h2>
+    <ul>
+        <li th:each="course : ${coursesFromFile}">
+            <span th:text="${course.title}">Course Title</span>,
+            <span th:text="${course.duration}">Course Duration</span> hour(s)
+        </li>
+    </ul>
 </div>
 
 <div>
