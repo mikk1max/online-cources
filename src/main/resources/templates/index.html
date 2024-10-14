@@ -2,62 +2,114 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <title>Online Courses</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+
+        }
+        .container div {
+            margin: 0 20px;
+            padding: 10px;
+            border: dotted black;
+            width: calc((100% - 80px) / 3);
+        }
+        h1 {
+            text-align: center;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
-<h1>Welcome to Online Courses</h1>
 
-<h2>Courses</h2>
-<ul>
-    <li th:each="course : ${courses}">
-        <span th:text="${course.title}">Course Title</span> -
-        <span th:text="${course.description}">Course Description</span>
-        (<span th:text="${course.duration}">Course Duration</span> hours)
-    </li>
-</ul>
+<h1>Welcome to Online Courses Info</h1>
 
-<h2>Students</h2>
-<ul>
-    <li th:each="student : ${students}">
-        <span th:text="${student.name}">Student Name</span>,
-        <span th:text="${student.age}">Student Age</span> years old
-    </li>
-</ul>
+<div class="container">
+<div>
+    <h2>Courses</h2>
+    <ul>
+        <li th:each="course : ${courses}">
+            <span th:text="${course.title}">Course Title</span> -
+            <span th:text="${course.description}">Course Description</span>
+            (<span th:text="${course.duration}">Course Duration</span> hours)
+        </li>
+    </ul>
+</div>
 
+<div>
+    <h2>Students</h2>
+    <ul>
+        <li th:each="student : ${students}">
+            <span th:text="${student.name}">Student Name</span>,
+            <span th:text="${student.age}">Student Age</span> years old
+        </li>
+    </ul>
 
+    <!-- Students containing "a" -->
+    <h2>Filtered Students with letter "a"</h2>
+    <ul>
+        <li th:each="student : ${filteredStudents}">
+            <span th:text="${student.name}">Student Name</span>,
+            <span th:text="${student.age}">Student Age</span> years old
+        </li>
+    </ul>
 
-<h2>Enrollments</h2>
-<ul>
-    <li th:each="enrollment : ${enrollments}">
-        <span th:text="${enrollment.student.name}">Student Name</span> enrolled in
-        <span th:text="${enrollment.course.title}">Course Title</span>
-    </li>
-</ul>
+    <h2>Duplicate Student Names</h2>
+    <ul>
+        <li th:each="entry : ${duplicateNames}">
+            <span th:text="${entry.key}">Student Name</span> -
+            <span th:text="${entry.value}">Count</span> time(s)
+        </li>
+        <li>
+            <span th:text="${amountDuplicateNames}"> </span> - amount of duplicated names
+        </li>
+    </ul>
+    <h2>Students from File (sort + filter)</h2>
+    <ul>
+        <li th:each="student : ${studentsFromFile}">
+            <span th:text="${student.name}">Student Name</span>,
+            <span th:text="${student.age}">Student Age</span> years old
+        </li>
+    </ul>
 
-<!-- Students containing "a" -->
-<h2>Filtered Students with letter "a"</h2>
-<ul>
-    <li th:each="student : ${filteredStudents}">
-        <span th:text="${student.name}">Student Name</span>,
-        <span th:text="${student.age}">Student Age</span> years old
-    </li>
-</ul>
+</div>
 
-<h2>Duplicate Student Names</h2>
-<ul>
-    <li th:each="entry : ${duplicateNames}">
-        <span th:text="${entry.key}">Student Name</span> -
-        <span th:text="${entry.value}">Count</span> time(s)
-    </li>
-    <li>
-        <span th:text="${amountDuplicateNames}"> </span> - amount of duplicated names
-    </li>
-</ul>
-<h2>Students from File</h2>
-<ul>
-    <li th:each="student : ${studentsFromFile}">
-        <span th:text="${student.name}">Student Name</span>,
-        <span th:text="${student.age}">Student Age</span> years old
-    </li>
-</ul>
+<div>
+    <h2>Enrollments</h2>
+    <ul>
+        <li th:each="enrollment : ${enrollments}">
+            <span th:text="${enrollment.student.name}">Student Name</span> enrolled in
+            <span th:text="${enrollment.course.title}">Course Title</span>
+        </li>
+    </ul>
+    <h2>Filtered by Student-name</h2>
+    <ul>
+        <li th:each="enrollment : ${streamEnrollmentsContainsSth}">
+            <span th:text="${enrollment.student.name}">Student Name</span>,
+            <span th:text="${enrollment.course.title}">Student course</span>,
+
+        </li>
+    </ul>
+    <h2>Student's Enrollments</h2>
+    <ul>
+        <li th:each="entry : ${studentEnrollmentCounts}">
+            <span th:text="${entry.key}">Student Name</span>,
+            <span th:text="${entry.value}">Student course</span>,
+
+        </li>
+    </ul>
+    <h2>Enrollments from file (sort + filter)</h2>
+    <ul>
+        <li th:each="enrollment : ${enrollmentsFromFile}">
+            <span th:text="${enrollment.student.name}">Enrollment Student Name</span>,
+            <span th:text="${enrollment.course.title}">Enrollment course title</span>
+            (<span th:text="${enrollment.course.duration}">Enrollment course duration</span>)
+        </li>
+    </ul>
+</div>
+</div>
 </body>
 </html>

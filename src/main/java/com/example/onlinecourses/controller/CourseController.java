@@ -5,37 +5,82 @@ import com.example.onlinecourses.model.Student;
 import com.example.onlinecourses.model.Enrollment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api") // Optional: define a common base path for the controller
 public class CourseController {
+
+    private List<Course> initializeCourses() {
+        List<Course> courses = new ArrayList<>();
+        courses.add(new Course("Spring Boot Basics", "Poznaj podstawy Spring Boot", 10));
+        courses.add(new Course("React Native", "Twórz aplikacje mobilne za pomocą React Native", 8));
+        courses.add(new Course("Advanced Java", "Master advanced concepts of Java programming", 12));
+        courses.add(new Course("Node.js & Express", "Build backend services using Node.js and Express", 9));
+        courses.add(new Course("HTML & CSS Fundamentals", "Learn the basics of web development with HTML and CSS", 6));
+        courses.add(new Course("JavaScript ES6+", "Explore modern JavaScript features from ES6 and beyond", 7));
+        courses.add(new Course("Database Management", "Understand relational databases and SQL", 10));
+        courses.add(new Course("Firebase Integration", "Integrate Firebase services in your mobile and web apps", 5));
+        courses.add(new Course("React.js", "Build interactive UIs with React.js", 8));
+        courses.add(new Course("REST API Development", "Design and implement RESTful APIs", 6));
+        return courses;
+    }
+
+    private List<Student> initializeStudents() {
+        List<Student> students = new ArrayList<>();
+        students.add(new Student("Milena Runets", 21));
+        students.add(new Student("Max Shepeta", 20));
+        students.add(new Student("Leanid Shaveika", 21));
+        students.add(new Student("John Doe", 22));
+        students.add(new Student("Oleg Nowak", 21));
+        students.add(new Student("Jane Doe", 21));
+        students.add(new Student("Justin Quinn", 15));
+        students.add(new Student("Rayan Goslindg", 13));
+        students.add(new Student("Oleg Nowak", 25));
+        students.add(new Student("John Doe", 22));
+        students.add(new Student("Adam Kim", 55));
+        students.add(new Student("Nicholas Jones", 15));
+        return students;
+    }
 
     @GetMapping("/courses")
     public List<Course> getCourses() {
-        List<Course> courses = new ArrayList<>();
-        courses.add(new Course("Spring Boot Basics", "Learn the basics of Spring Boot", 10));
-        courses.add(new Course("React Native", "Build mobile apps using React Native", 8));
-        return courses;
+        return initializeCourses();
     }
 
     @GetMapping("/students")
     public List<Student> getStudents() {
-        List<Student> students = new ArrayList<>();
-        students.add(new Student("John Doe", 22));
-        students.add(new Student("Jane Doe", 21));
-        return students;
+        return initializeStudents();
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/enrollments")
+    @GetMapping("/enrollments")
     public List<Enrollment> getEnrollments() {
-        Student student = new Student("John Doe", 22);
-        Course course = new Course("Spring Boot Basics", "Learn the basics of Spring Boot", 10);
+        List<Course> courses = initializeCourses();
+        List<Student> students = initializeStudents();
+
         List<Enrollment> enrollments = new ArrayList<>();
-        enrollments.add(new Enrollment(student, course));
+        enrollments.add(new Enrollment(students.get(0), courses.get(0)));
+        enrollments.add(new Enrollment(students.get(1), courses.get(1)));
+        enrollments.add(new Enrollment(students.get(0), courses.get(2)));
+        enrollments.add(new Enrollment(students.get(1), courses.get(3)));
+        enrollments.add(new Enrollment(students.get(2), courses.get(4)));
+        enrollments.add(new Enrollment(students.get(2), courses.get(5)));
+        enrollments.add(new Enrollment(students.get(3), courses.get(2)));
+        enrollments.add(new Enrollment(students.get(3), courses.get(6)));
+        enrollments.add(new Enrollment(students.get(4), courses.get(7)));
+        enrollments.add(new Enrollment(students.get(5), courses.get(8)));
+        enrollments.add(new Enrollment(students.get(1), courses.get(7)));
+        enrollments.add(new Enrollment(students.get(5), courses.get(9)));
+        enrollments.add(new Enrollment(students.get(6), courses.get(5)));
+        enrollments.add(new Enrollment(students.get(7), courses.get(6)));
+        enrollments.add(new Enrollment(students.get(8), courses.get(4)));
+        enrollments.add(new Enrollment(students.get(9), courses.get(3)));
+        enrollments.add(new Enrollment(students.get(10), courses.get(1)));
+        enrollments.add(new Enrollment(students.get(11), courses.get(0)));
+        enrollments.add(new Enrollment(students.get(1), courses.get(0)));
         return enrollments;
     }
 }
