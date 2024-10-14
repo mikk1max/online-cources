@@ -19,9 +19,9 @@ import java.util.stream.Stream;
 @Controller
 public class HomeController {
 
-    private static final String STUDENT_FILE_PATH = "students.txt";
-    private static final String COURSE_FILE_PATH = "courses.txt";
-    private static final String ENROLLMENT_FILE_PATH = "enrollments.txt";
+    private static final String STUDENT_FILE_PATH = "./src/main/resources/data/students.txt";
+    private static final String COURSE_FILE_PATH = "./src/main/resources/data/courses.txt";
+    private static final String ENROLLMENT_FILE_PATH = "./src/main/resources/data/enrollments.txt";
 
     private List<Course> courses;
     private List<Student> students;
@@ -197,7 +197,7 @@ public class HomeController {
 
     //metoda zapisu JavaIO
     public void writeCoursesToFileJavaIO(List<Course> courses) {
-        File file = new File("CoursesIO.txt");
+        File file = new File("./src/main/resources/data/CoursesIO.txt");
         try {
             FileWriter fileWriter = new FileWriter(file, false);
             for (int i = 0; i < courses.size(); i++) {
@@ -213,7 +213,7 @@ public class HomeController {
     public List<Course> readCoursesFromFileJavaIO() {
         List<Course> courses = new ArrayList<>(); // Assuming courses is locally defined, change it if it's class-level
 
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("CoursesIO.txt"))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("./src/main/resources/data/CoursesIO.txt"))) {
             String linia;
             while ((linia = bufferedReader.readLine()) != null) {
                 String[] parts = linia.split("-"); // Assuming the format is title-duration
