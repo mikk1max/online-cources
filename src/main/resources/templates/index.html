@@ -69,6 +69,13 @@
             <span th:text="${course.duration}">Course Duration</span> hour(s)
         </li>
     </ul>
+    <h2>Courses from File JavaIO</h2>
+    <ul>
+        <li th:each="course : ${coursesFromFileJavaIO}">
+            <span th:text="${course.title}">Course Title</span>,
+            <span th:text="${course.duration}">Course Duration</span> hour(s)
+        </li>
+    </ul>
 </div>
 
 <div>
