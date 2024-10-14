@@ -5,7 +5,8 @@ import com.example.onlinecourses.model.Enrollment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import java.io.IOException;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -139,6 +140,12 @@ public class HomeController {
         //odczytanie z pliku
         List<Course> coursesFromFile = readCoursesFromFile();
 
+        //zapis do pliku JavaIO
+        writeCoursesToFileJavaIO(courses);
+
+        //odczyt z pliku JavaIO
+        List<Course> coursesFromFileJavaIO = readCoursesFromFileJavaIO();
+
 
 
         // !Enrollments part
@@ -172,6 +179,7 @@ public class HomeController {
         model.addAttribute("amountOfDuplicateCourses", amountOfDuplicateCourses);
         model.addAttribute("streamCourseDurationsInMinutes", streamCourseDurationsInMinutes);
         model.addAttribute("coursesFromFile", coursesFromFile);
+        model.addAttribute("coursesFromFileJavaIO", coursesFromFileJavaIO);
 
         model.addAttribute("students", students);
         model.addAttribute("filteredStudents", streamStudents);
@@ -185,6 +193,54 @@ public class HomeController {
         model.addAttribute("enrollmentsFromFile", enrollmentsFromFile);
 
         return "index";
+    }
+
+    //metoda zapisu JavaIO
+    public void writeCoursesToFileJavaIO(List<Course> courses) {
+        File file = new File("CoursesIO.txt");
+        try {
+            FileWriter fileWriter = new FileWriter(file, false);
+            for (int i = 0; i < courses.size(); i++) {
+                fileWriter.append(courses.get(i).getTitle() + "-" + courses.get(i).getDuration()+"\n");
+            }
+            fileWriter.close();
+        } catch (IOException ex) {
+            System.err.println(ex.getCause());
+        }
+    }
+
+    //metoda odczytu JavaIO
+    public List<Course> readCoursesFromFileJavaIO() {
+        List<Course> courses = new ArrayList<>(); // Assuming courses is locally defined, change it if it's class-level
+
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("CoursesIO.txt"))) {
+            String linia;
+            while ((linia = bufferedReader.readLine()) != null) {
+                String[] parts = linia.split("-"); // Assuming the format is title-duration
+                if (parts.length == 2) {
+                    String title = parts[0];
+                    int duration;
+                    try {
+                        duration = Integer.parseInt(parts[1].trim()); // Trim to remove any spaces
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid duration format for line: " + linia);
+                        continue; // Skip this line and continue with the next one
+                    }
+                    courses.add(new Course(title, "", duration));
+                } else {
+                    System.out.println("Invalid line format: " + linia);
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            System.out.println("Plik nie odnaleziono!");
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            System.out.println("Błąd odczytu pliku spowodowany:");
+            ex.printStackTrace();
+        }
+
+        // Process courses if needed or return them if the method signature allows
+        return courses;
     }
 
     // Metoda do zapisu kursow do pliku

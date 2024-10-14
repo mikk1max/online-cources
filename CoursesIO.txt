@@ -1,0 +1,10 @@
+Spring Boot Basics-10
+React Native-8
+Advanced Java-12
+Node.js & Express-9
+HTML & CSS Fundamentals-6
+JavaScript ES6+-7
+Database Management-10
+Firebase Integration-5
+React.js-8
+REST API Development-6
