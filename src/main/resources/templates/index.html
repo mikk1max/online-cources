@@ -76,6 +76,20 @@
             <span th:text="${course.duration}">Course Duration</span> hour(s)
         </li>
     </ul>
+    <h2>Courses from XML - String</h2>
+    <ul>
+        <li th:each="course : ${StringCoursesFromXML}">
+            <span th:text="${course}"></span>
+        </li>
+    </ul>
+    <h2>Courses from XML - Objects</h2>
+    <ul>
+        <li th:each="course : ${ObjectsCoursesFromXML}">
+            <span th:text="${course.title}">Course Title</span> -
+            <span th:text="${course.description}">Course Description</span>
+            (<span th:text="${course.duration}">Course Duration</span> hours)
+        </li>
+    </ul>
 </div>
 
 <div>
@@ -113,11 +127,10 @@
             <span th:text="${student.age}">Student Age</span> years old
         </li>
     </ul>
-<h2>Students from XML</h2>
+<h2>Students from XML-String</h2>
 <ul>
-    <li th:each="student : ${studentxml.students}">
-        <span th:text="${student.name}">Student Name</span>,
-        <span th:text="${student.age}">Student Age</span> years old
+    <li th:each="student : ${studentxml}">
+        <span th:text="${student}"></span>
     </li>
 </ul>
     <h2>Student from XML</h2>
