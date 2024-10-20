@@ -10,6 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.xml.stream.*;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,6 +31,7 @@ public class HomeController {
     private static final String ENROLLMENT_FILE_PATH = "./src/main/resources/data/enrollments.txt";
     private static final String STUDENT_FILE_XML_PATH = "./src/main/resources/data/students.xml";
     private static final String STUDENT_FILE_XML_PATH2 = "./src/main/resources/data/students2.xml";
+    private static final String XML_COURSES_FILE_PATH = "./src/main/resources/data/courses.xml";
     private List<Course> courses;
     private List<Student> students;
     private List<Enrollment> enrollments;
@@ -188,7 +192,7 @@ public class HomeController {
             saveToXMLStudents(studentxml);
 
             // Odczyt studentów z XML-a
-            StudentList loadedStudents = readFromXMLStudents();
+            List<String> loadedStudents = readStudentFromXML(STUDENT_FILE_XML_PATH);
             model.addAttribute("studentxml", loadedStudents);
 
 
@@ -239,6 +243,32 @@ public class HomeController {
            xmlStreamReader.next();
        }
 
+       //!Zapis i odczyt kursow do-z XML
+        try {
+            // Tworzenie nowej listy kursow
+            List<Course> coursesListXML = new ArrayList<>();
+            coursesListXML.add(new Course("English lanuage", "Courses of english lanuage", 24));
+            coursesListXML.add(new Course("Spanish lanuage", "Courses of spanish lanuage", 30));
+            coursesListXML.add(new Course("French lanuage", "Courses of french lanuage", 36));
+
+            // Zapis kursow do XML-a
+            saveToXMLCourses(coursesListXML);
+
+
+            // Odczyt kursow z XML-a do listy string
+            List<String> readedCourses = readCourseFromXML(XML_COURSES_FILE_PATH);
+            model.addAttribute("StringCoursesFromXML",readedCourses);
+
+            // Odczyt kursow z XML-a do listy klasy Course
+            List<Course> loadedCourses = CoursesFromXMLtoObjects(XML_COURSES_FILE_PATH);
+            model.addAttribute("ObjectsCoursesFromXML",loadedCourses);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         model.addAttribute("courses",courses);
         model.addAttribute("streamCoursesWithJava",streamCoursesWithJava);
         model.addAttribute("duplicateDurationsOfCourses",duplicateDurationsOfCourses);
@@ -246,7 +276,9 @@ public class HomeController {
         model.addAttribute("streamCourseDurationsInMinutes",streamCourseDurationsInMinutes);
         model.addAttribute("coursesFromFile",coursesFromFile);
         model.addAttribute("coursesFromFileJavaIO",coursesFromFileJavaIO);
-        model.addAttribute("zad2", zad2);
+        //lab2
+
+
 
         model.addAttribute("students",students);
 
@@ -254,6 +286,7 @@ public class HomeController {
         model.addAttribute("duplicateNames",duplicateNames);
         model.addAttribute("amountDuplicateNames",amountDuplicateNames);
         model.addAttribute("studentsFromFile",studentsFromFile);
+        model.addAttribute("zad2", zad2);
 
         model.addAttribute("enrollments",enrollments);
         model.addAttribute("streamEnrollmentsContainsSth",streamEnrollmentsContainsSth);
@@ -449,17 +482,17 @@ public static void saveToXMLStudents(StudentList students) {//zapisanie listy st
 }
 
 private static void saveStudentXML(XMLStreamWriter xmlStreamWriter, Student student) throws XMLStreamException {
-    xmlStreamWriter.writeStartElement("student"); // Начало элемента "student"
+    xmlStreamWriter.writeStartElement("student"); // Początek elementu "student"
 
     xmlStreamWriter.writeStartElement("name");
-    xmlStreamWriter.writeCharacters(student.getName()); // Имя студента
-    xmlStreamWriter.writeEndElement(); // Конец элемента "name"
+    xmlStreamWriter.writeCharacters(student.getName()); // imie studenta
+    xmlStreamWriter.writeEndElement(); // Koniec elementu "name"
 
     xmlStreamWriter.writeStartElement("age");
-    xmlStreamWriter.writeCharacters(String.valueOf(student.getAge())); // Возраст студента
-    xmlStreamWriter.writeEndElement(); // Конец элемента "age"
+    xmlStreamWriter.writeCharacters(String.valueOf(student.getAge())); // wiek studenta
+    xmlStreamWriter.writeEndElement(); // Koniec elementu "age"
 
-    xmlStreamWriter.writeEndElement(); // Конец элемента "student"
+    xmlStreamWriter.writeEndElement(); // Koniec elementu "student"
 }
 
 
@@ -498,6 +531,52 @@ private static StudentList readFromXMLStudents() throws Exception {
     studentList.setStudents(students);
     return studentList;
 }
+    public static List<String> readStudentFromXML(String filename) {
+        List<String> studentData = new ArrayList<>();
+        String currentElement = "";
+        StringBuilder studentInfo = new StringBuilder();
+
+        try {
+            // Tworzenie fabryki i parsera XML do odczytu danych
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream(filename));
+
+            // Parsowanie dokumentu i odczytywanie danych
+            while (eventReader.hasNext()) {
+                XMLEvent event = eventReader.nextEvent();
+
+                if (event.isStartElement()) {
+                    StartElement startElement = event.asStartElement();
+                    currentElement = startElement.getName().getLocalPart();
+                }
+
+                if (event.isCharacters()) {
+                    Characters characters = event.asCharacters();
+
+                    if (!characters.isWhiteSpace()) {
+                        switch (currentElement) {
+                            case "name":
+                                studentInfo.append("Name: ").append(characters.getData()).append("\n");
+                                break;
+                            case "age":
+                                studentInfo.append("Age: ").append(characters.getData()).append("\n");
+                                break;
+                        }
+                    }
+                }
+
+                // Gdy napotkamy zamykający tag <student>, dodajemy dane studentu do listy
+                if (event.isEndElement() && event.asEndElement().getName().getLocalPart().equals("student")) {
+                    studentData.add(studentInfo.toString());
+                    studentInfo.setLength(0); // Czyszczenie StringBuildera dla następnego kursu
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return studentData;
+    }
 
 
 private static Student readStudent(XMLStreamReader xmlStreamReader) throws XMLStreamException {
@@ -529,8 +608,155 @@ private static Student readStudent(XMLStreamReader xmlStreamReader) throws XMLSt
     }
 }
 
+public static void saveToXMLCourses(List<Course> courses) {//zapisanie listy kursow
+        XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+
+        try (FileOutputStream outputStream = new FileOutputStream(XML_COURSES_FILE_PATH)) {
+            XMLStreamWriter xmlStreamWriter = outputFactory.createXMLStreamWriter(outputStream);
+            xmlStreamWriter.writeStartDocument("UTF-8", "1.0");
+            xmlStreamWriter.writeStartElement("courses"); // Początek elementu głównego
+
+            for (Course course : courses) {
+                xmlStreamWriter.writeStartElement("course"); // Początek elementu "course"
+
+                xmlStreamWriter.writeStartElement("title");
+                xmlStreamWriter.writeCharacters(course.getTitle()); // Nazwa kursu
+                xmlStreamWriter.writeEndElement(); // Koniec elementu
+
+                xmlStreamWriter.writeStartElement("description");
+                xmlStreamWriter.writeCharacters(course.getDescription()); // opis
+                xmlStreamWriter.writeEndElement(); // Koniec elementu
+
+                xmlStreamWriter.writeStartElement("duration");
+                xmlStreamWriter.writeCharacters(String.valueOf(course.getDuration())); // czas trwania kursu
+                xmlStreamWriter.writeEndElement(); // Koniec elementu
+
+                xmlStreamWriter.writeEndElement(); // Koniec elementu "course"
+            }
+
+            xmlStreamWriter.writeEndElement(); // Koniec elementu głównego
+            xmlStreamWriter.writeEndDocument();
+            xmlStreamWriter.flush();
+        } catch (IOException | XMLStreamException e) {
+            System.err.println("Błąd podczas zapisywania danych kursow do XML: " + e.getMessage());
+        }
+    }
+
+    public static List<String> readCourseFromXML(String filename) {
+        List<String> courseData = new ArrayList<>();
+        String currentElement = "";
+        StringBuilder courseInfo = new StringBuilder();
+
+        try {
+            // Tworzenie fabryki i parsera XML do odczytu danych
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream(filename));
+
+            // Parsowanie dokumentu i odczytywanie danych
+            while (eventReader.hasNext()) {
+                XMLEvent event = eventReader.nextEvent();
+
+                if (event.isStartElement()) {
+                    StartElement startElement = event.asStartElement();
+                    currentElement = startElement.getName().getLocalPart();
+                }
+
+                if (event.isCharacters()) {
+                    Characters characters = event.asCharacters();
+
+                    if (!characters.isWhiteSpace()) {
+                        switch (currentElement) {
+                            case "title":
+                                courseInfo.append("Title: ").append(characters.getData()).append("\n");
+                                break;
+                            case "description":
+                                courseInfo.append("Description: ").append(characters.getData()).append("\n");
+                                break;
+                            case "duration":
+                                courseInfo.append("Duration: ").append(characters.getData()).append(" hours\n");
+                                break;
+                        }
+                    }
+                }
+
+                // Gdy napotkamy zamykający tag <course>, dodajemy dane kursu do listy
+                if (event.isEndElement() && event.asEndElement().getName().getLocalPart().equals("course")) {
+                    courseData.add(courseInfo.toString());
+                    courseInfo.setLength(0); // Czyszczenie StringBuildera dla następnego kursu
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return courseData;
+    }
 
 
+    public static List<Course> CoursesFromXMLtoObjects(String fileName) {
+        List<Course> courses = new ArrayList<>();
+        Course currentCourse = null;
+        String currentElement = "";
+        String title = "";
+        String description = "";
+        int duration = 0;
+
+        try {
+            // Tworzenie fabryki i strumieniowego parsera do odczytu XML
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream(fileName));
+
+            // Obsługa zdarzeń XML
+            while (eventReader.hasNext()) {
+                XMLEvent event = eventReader.nextEvent();
+
+                // Jeśli rozpoczął się nowy element
+                if (event.isStartElement()) {
+                    StartElement startElement = event.asStartElement();
+                    currentElement = startElement.getName().getLocalPart();
+
+                    if ("course".equals(currentElement)) {
+                        // Nowy obiekt Course
+                        currentCourse = new Course("", "", 0);
+                    }
+                }
+
+                // Jeśli to tekst między znacznikami
+                if (event.isCharacters()) {
+                    Characters characters = event.asCharacters();
+
+                    if (!characters.isWhiteSpace()) {
+                        switch (currentElement) {
+                            case "title":
+                                title = characters.getData();
+                                break;
+                            case "description":
+                                description = characters.getData();
+                                break;
+                            case "duration":
+                                duration = Integer.parseInt(characters.getData());
+                                break;
+                        }
+                    }
+                }
+
+                // Jeśli zamykający znacznik elementu
+                if (event.isEndElement()) {
+                    String endElement = event.asEndElement().getName().getLocalPart();
+
+                    if ("course".equals(endElement)) {
+                        // Zakończ tworzenie obiektu Course i dodaj go do listy
+                        currentCourse = new Course(title, description, duration);
+                        courses.add(currentCourse);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return courses;
+    }
 
 
 }
