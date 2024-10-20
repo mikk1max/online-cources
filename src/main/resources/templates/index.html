@@ -113,6 +113,22 @@
             <span th:text="${student.age}">Student Age</span> years old
         </li>
     </ul>
+<h2>Students from XML</h2>
+<ul>
+    <li th:each="student : ${studentxml.students}">
+        <span th:text="${student.name}">Student Name</span>,
+        <span th:text="${student.age}">Student Age</span> years old
+    </li>
+</ul>
+    <h2>Student from XML</h2>
+<ul>
+    <li th:each="student : ${zad2}">
+        <span th:text="${student.name}">Student Name</span>,
+        <span th:text="${student.age}">Student Age</span> years old
+    </li>
+</ul>
+
+
 
 </div>
 
