@@ -8,8 +8,11 @@ public class Student {
         this.name = name;
         this.age = age;
     }
+    public Student(){
 
-    // Геттеры и сеттеры
+    }
+
+    // Getters and setters
     public String getName() {
         return name;
     }
