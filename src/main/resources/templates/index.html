@@ -177,6 +177,14 @@
             (<span th:text="${enrollment.course.duration}">Enrollment course duration</span>)
         </li>
     </ul>
+    <h2>Enrollments from XML</h2>
+    <ul>
+        <li th:each="enrollment : ${enrollmentsFromXML}">
+            <span th:text="${enrollment.student.name}">Enrollment Student Name</span>,
+            <span th:text="${enrollment.course.title}">Enrollment course title</span>
+            (<span th:text="${enrollment.course.duration}">Enrollment course duration</span>)
+        </li>
+    </ul>
 </div>
 </div>
 </body>

@@ -29,9 +29,12 @@ public class HomeController {
     private static final String STUDENT_FILE_PATH = "./src/main/resources/data/students.txt";
     private static final String COURSE_FILE_PATH = "./src/main/resources/data/courses.txt";
     private static final String ENROLLMENT_FILE_PATH = "./src/main/resources/data/enrollments.txt";
+
     private static final String STUDENT_FILE_XML_PATH = "./src/main/resources/data/students.xml";
     private static final String STUDENT_FILE_XML_PATH2 = "./src/main/resources/data/students2.xml";
     private static final String XML_COURSES_FILE_PATH = "./src/main/resources/data/courses.xml";
+    private static final String ENROLLMENT_FILE_XML_PATH = "./src/main/resources/data/enrollments.xml";
+
     private List<Course> courses;
     private List<Student> students;
     private List<Enrollment> enrollments;
@@ -93,7 +96,7 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home(Model model) throws XMLStreamException, FileNotFoundException {
+    public String home(Model model) throws XMLStreamException, IOException {
 
         courses = initializeCourses();
         students = initializeStudents();
@@ -176,6 +179,10 @@ public class HomeController {
 
         // Read from the file
         List<Enrollment> enrollmentsFromFile = readEnrollmentsFromFile();
+
+        // XML
+        saveEnrollmentsToXML(enrollments);
+        List<Enrollment> enrollmentsFromXML = readEnrollmentsFromXML();
 
 
         //!Lista Studentów XML
@@ -276,12 +283,9 @@ public class HomeController {
         model.addAttribute("streamCourseDurationsInMinutes",streamCourseDurationsInMinutes);
         model.addAttribute("coursesFromFile",coursesFromFile);
         model.addAttribute("coursesFromFileJavaIO",coursesFromFileJavaIO);
-        //lab2
-
 
 
         model.addAttribute("students",students);
-
         model.addAttribute("filteredStudents",streamStudents);
         model.addAttribute("duplicateNames",duplicateNames);
         model.addAttribute("amountDuplicateNames",amountDuplicateNames);
@@ -292,6 +296,7 @@ public class HomeController {
         model.addAttribute("streamEnrollmentsContainsSth",streamEnrollmentsContainsSth);
         model.addAttribute("studentEnrollmentCounts",studentEnrollmentCounts);
         model.addAttribute("enrollmentsFromFile",enrollmentsFromFile);
+        model.addAttribute("enrollmentsFromXML",enrollmentsFromXML);
 
         return"index";
 }
@@ -756,6 +761,79 @@ public static void saveToXMLCourses(List<Course> courses) {//zapisanie listy kur
         }
 
         return courses;
+    }
+
+    public void saveEnrollmentsToXML (List<Enrollment> enrollments) throws XMLStreamException, IOException {
+        XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+        try (FileOutputStream outputStream = new FileOutputStream(ENROLLMENT_FILE_XML_PATH)) {
+            XMLStreamWriter writer = outputFactory.createXMLStreamWriter(outputStream);
+            writer.writeStartDocument("UTF-8", "1.0");
+            writer.writeStartElement("enrollments");
+
+            for (Enrollment enrollment : enrollments) {
+                writer.writeStartElement("enrollment");
+
+                writer.writeStartElement("student");
+                writer.writeCharacters(enrollment.getStudent().getName());
+                writer.writeEndElement();
+
+                writer.writeStartElement("course");
+                writer.writeCharacters(enrollment.getCourse().getTitle());
+                writer.writeEndElement();
+
+                writer.writeEndElement();
+            }
+
+            writer.writeEndElement();
+            writer.writeEndDocument();
+        }
+    }
+
+    public List<Enrollment> readEnrollmentsFromXML() {
+        List<Enrollment> enrollments = new ArrayList<>();
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+
+        try (FileInputStream inputStream = new FileInputStream(ENROLLMENT_FILE_XML_PATH)) {
+            XMLStreamReader reader = inputFactory.createXMLStreamReader(inputStream);
+
+            String studentName = null;
+            String courseTitle = null;
+
+            while (reader.hasNext()) {
+                reader.next();
+
+                if (reader.isStartElement()) {
+                    if ("student".equals(reader.getLocalName())) {
+                        studentName = reader.getElementText();
+                    } else if ("course".equals(reader.getLocalName())) {
+                        courseTitle = reader.getElementText();
+                    }
+                }
+
+                if (reader.isEndElement() && "enrollment".equals(reader.getLocalName())) {
+                    try {
+                        Student student = findStudentByName(studentName);
+                        Course course = findCourseByTitle(courseTitle);
+                        if (student == null || course == null) {
+                            throw new Exception("Invalid data for enrollment: " + studentName + ", " + courseTitle);
+                        }
+                        enrollments.add(new Enrollment(student, course));
+                    } catch (Exception e) {
+                        System.err.println("Błąd: " + e.getMessage());
+                    }
+
+                    studentName = null;
+                    courseTitle = null;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (XMLStreamException e) {
+            throw new RuntimeException(e);
+        }
+        return enrollments;
     }
 
 
