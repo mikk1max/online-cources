@@ -129,13 +129,13 @@
     </ul>
 <h2>Students from XML-String</h2>
 <ul>
-    <li th:each="student : ${studentxml}">
+    <li th:each="student : ${studentStrings}">
         <span th:text="${student}"></span>
     </li>
 </ul>
-    <h2>Student from XML</h2>
+    <h2>Student from XML-Object</h2>
 <ul>
-    <li th:each="student : ${zad2}">
+    <li th:each="student : ${studentObjects}">
         <span th:text="${student.name}">Student Name</span>,
         <span th:text="${student.age}">Student Age</span> years old
     </li>
@@ -172,6 +172,14 @@
     <h2>Enrollments from file (sort + filter)</h2>
     <ul>
         <li th:each="enrollment : ${enrollmentsFromFile}">
+            <span th:text="${enrollment.student.name}">Enrollment Student Name</span>,
+            <span th:text="${enrollment.course.title}">Enrollment course title</span>
+            (<span th:text="${enrollment.course.duration}">Enrollment course duration</span>)
+        </li>
+    </ul>
+    <h2>Enrollments from XML</h2>
+    <ul>
+        <li th:each="enrollment : ${enrollmentsFromXML}">
             <span th:text="${enrollment.student.name}">Enrollment Student Name</span>,
             <span th:text="${enrollment.course.title}">Enrollment course title</span>
             (<span th:text="${enrollment.course.duration}">Enrollment course duration</span>)

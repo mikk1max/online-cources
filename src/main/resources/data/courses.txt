@@ -1,6 +1,0 @@
-React Native-8
-React.js-8
-Node.js & Express-9
-Spring Boot Basics-10
-Database Management-10
-Advanced Java-12
